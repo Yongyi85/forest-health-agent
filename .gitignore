@@ -1,0 +1,44 @@
+# Sensitive
+.env*
+config.js
+*secret*
+*key*
+*.py
+*.log
+*.json
+*.txt
+*.sh
+*.md
+
+# Build
+node_modules/
+.next/
+public/
+src/
+supabase/
+pipeline/
+scripts/
+web/
+.surgetmp/
+__pycache__/
+
+# Misc
+.DS_Store
+CNAME
+README.md
+*.ts
+*.tsx
+*.mjs
+postcss.config.*
+tailwind.config.*
+tsconfig.json
+package*.json
+next.config.*
+next-env.d.ts
+server.py
+deploy_to_surge.sh
+base_records*.json
+*backup*
+translate_*.py
+install_*.py
+eslint.config.*
