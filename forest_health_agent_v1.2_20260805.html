@@ -1,4 +1,4 @@
-<!-- v20260805d -->
+<!-- v20260805e -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -547,19 +547,29 @@ async function callDeepSeek(question, contextRefs, conversationHistory) {
 
   // 咨询师人格 + 动态上下文
   const refInstruction = hasRefs
-    ? `## 可用的参考文献（请在回答中自然引用）\n${contextText}\n\n## 引用格式要求（非常重要）
-引用文献时，必须使用带真实链接的 Markdown 格式，让用户可以直接点击跳转：
-- 有 DOI 的文献：用 [文献标题](DOI链接) 或 [[1]](DOI链接) 的格式
-- 有 PubMed URL 的文献：用 [文献标题](PubMed链接) 或 [[1]](PubMed链接) 的格式
-- DOI 链接格式：https://doi.org/实际DOI号（如 https://doi.org/10.1016/j.xxx）
-- PubMed 链接格式：https://pubmed.ncbi.nlm.nih.gov/PMID/
-- 如果两者都有，优先用 DOI 链接
-- 每条引用的编号 [1][2] 等对应上方文献列表的序号
+    ? `## 可用的参考文献（以下文献是你的唯一引用来源）\n${contextText}\n\n## 严格引用规则（必须遵守）
+**铁律：你只能引用上方"可用参考文献"列表中编号 [1]-[${contextRefs.length}] 的文献。绝对不允许编造任何文献！**
 
-示例：
-- 正确写法：研究发现森林浴能显著降低皮质醇水平[[1]](https://doi.org/10.1289/ehp.1234)，同时改善心血管指标[[2]](https://pubmed.ncbi.nlm.nih.gov/12345678/)
-- 错误写法：研究发现森林浴能显著降低皮质醇水平[1]（没有链接）`
-    : `当前未在文献库中检索到直接匹配的文献。请以你的专业知识直接回答，不需要引用文献。如果适合，可以建议用户用英文关键词搜索以获取更多文献支持。`;
+引用时，每个引用编号必须带可点击链接：
+- [[1]](https://doi.org/实际DOI号) — 有DOI的文献
+- [[1]](https://pubmed.ncbi.nlm.nih.gov/PMID/) — 有PubMed ID的文献
+- 如果某条文献同时有DOI和PubMed，优先用DOI
+
+**每次提到某篇文献的结论或发现时，必须紧跟带链接的引用编号。格式示例：**
+- "森林浴能显著降低皮质醇水平[[1]](https://doi.org/10.1289/ehp.xxx)"
+- "研究表明NK细胞活性提升[[2]](https://pubmed.ncbi.nlm.nih.gov/30462123/)"
+
+**当用户明确要求推荐/查找文献时，你必须：**
+1. 从上方列表中挑选最相关的文献
+2. 以"📚 推荐文献"小节列出，每条格式为：**文献标题** — 一句话说明推荐理由 [[编号]](链接)
+3. 如果列表中有多篇好文献，尽量多列几条
+4. 每条都要有真实可点击的链接
+
+**绝对禁止：**
+- ❌ 编造不在上方列表中的文献标题、作者、DOI
+-  提到文献但不带链接（如只写 [1] 而没有链接）
+- ❌ 说"请搜索相关文献"而不给出具体文献`
+    : `当前未在文献库中检索到直接匹配的文献。请以你的专业知识直接回答。如果用户要求推荐文献，请诚实说明暂未找到匹配的文献，并建议用户用英文关键词（如 forest bathing, phytoncide, cortisol, anxiety 等）重新搜索，或切换到"文献检索"Tab进行精确检索。`;
 
   const systemPrompt = `你是"森疗小助手"——一位专业、温暖、有洞察力的森林疗愈咨询师。
 
@@ -648,8 +658,27 @@ function renderMarkdown(text) {
     const items = list.trim().split('\n').map(l => '<li>'+l.replace(/^\d+\. /,'')+'</li>').join('');
     return '<ol>'+items+'</ol>';
   });
-  // Reference links [N]
-  html = html.replace(/\[(\d+)\]/g, '<span class="ref-link" onclick="scrollToRef($1)">[$1]</span>');
+  // Markdown links [text](url) — must run BEFORE bare [N] replacement
+  html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:underline">$1</a>');
+  // Reference links [N] (only bare ones, not already inside <a> tags)
+  html = html.replace(/\[(\d+)\]/g, function(match, num) {
+    // Check if this citation has a link from our references
+    if(chatContextRefs && chatContextRefs[num-1]) {
+      const ref = chatContextRefs[num-1];
+      let url = '';
+      if(ref.doi) {
+        url = ref.doi.startsWith('http') ? ref.doi : 'https://doi.org/' + ref.doi;
+      } else if(ref.pubmed_url) {
+        url = ref.pubmed_url;
+      } else if(ref.pmid) {
+        url = 'https://pubmed.ncbi.nlm.nih.gov/' + ref.pmid + '/';
+      }
+      if(url) {
+        return `<a href="${url}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:600">[${num}]</a>`;
+      }
+    }
+    return `<span class="ref-link" onclick="scrollToRef(${num})" style="cursor:pointer;color:var(--primary);font-weight:600">[${num}]</span>`;
+  });
   // Line breaks
   html = html.replace(/\n\n/g, '<br><br>');
   html = html.replace(/\n/g, '<br>');
