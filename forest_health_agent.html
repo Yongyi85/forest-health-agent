@@ -1,4 +1,4 @@
-<!-- v20260805c -->
+<!-- v20260805d -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -530,11 +530,35 @@ async function searchReferencesForChat(query) {
 
 async function callDeepSeek(question, contextRefs, conversationHistory) {
   const hasRefs = contextRefs && contextRefs.length > 0;
-  const contextText = hasRefs ? contextRefs.map((r,i) => `[${i+1}] ${r.title} (${r.journal}, ${r.pub_date||'未知年份'})\n证据类型: ${EVIDENCE_LABELS[r.evidence_polarity]||r.evidence_polarity||'未分类'}\n摘要: ${(r.abstract_cn||r.abstract||'无摘要').substring(0,300)}`).join('\n\n') : '';
+  const contextText = hasRefs ? contextRefs.map((r,i) => {
+    let ref = `[${i+1}] ${r.title} (${r.journal}, ${r.pub_date||'未知年份'})\n证据类型: ${EVIDENCE_LABELS[r.evidence_polarity]||r.evidence_polarity||'未分类'}`;
+    if(r.doi) {
+      const doiUrl = r.doi.startsWith('http') ? r.doi : 'https://doi.org/' + r.doi;
+      ref += `\nDOI链接: ${doiUrl}`;
+    }
+    if(r.pubmed_url) {
+      ref += `\nPubMed链接: ${r.pubmed_url}`;
+    } else if(r.pmid) {
+      ref += `\nPubMed链接: https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`;
+    }
+    ref += `\n摘要: ${(r.abstract_cn||r.abstract||'无摘要').substring(0,300)}`;
+    return ref;
+  }).join('\n\n') : '';
 
   // 咨询师人格 + 动态上下文
   const refInstruction = hasRefs
-    ? `## 可用的参考文献（请在回答中自然引用）\n${contextText}\n\n请在回答的合适位置用 [1]、[2] 等方式引用上述文献。如果文献与用户问题关联不大，可以主要以专业知识回答，仅在相关处引用。`
+    ? `## 可用的参考文献（请在回答中自然引用）\n${contextText}\n\n## 引用格式要求（非常重要）
+引用文献时，必须使用带真实链接的 Markdown 格式，让用户可以直接点击跳转：
+- 有 DOI 的文献：用 [文献标题](DOI链接) 或 [[1]](DOI链接) 的格式
+- 有 PubMed URL 的文献：用 [文献标题](PubMed链接) 或 [[1]](PubMed链接) 的格式
+- DOI 链接格式：https://doi.org/实际DOI号（如 https://doi.org/10.1016/j.xxx）
+- PubMed 链接格式：https://pubmed.ncbi.nlm.nih.gov/PMID/
+- 如果两者都有，优先用 DOI 链接
+- 每条引用的编号 [1][2] 等对应上方文献列表的序号
+
+示例：
+- 正确写法：研究发现森林浴能显著降低皮质醇水平[[1]](https://doi.org/10.1289/ehp.1234)，同时改善心血管指标[[2]](https://pubmed.ncbi.nlm.nih.gov/12345678/)
+- 错误写法：研究发现森林浴能显著降低皮质醇水平[1]（没有链接）`
     : `当前未在文献库中检索到直接匹配的文献。请以你的专业知识直接回答，不需要引用文献。如果适合，可以建议用户用英文关键词搜索以获取更多文献支持。`;
 
   const systemPrompt = `你是"森疗小助手"——一位专业、温暖、有洞察力的森林疗愈咨询师。
