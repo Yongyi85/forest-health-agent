@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>森林疗愈智能体 - Forest Health Agent</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary: #2d6a4f;
+  --primary-light: #40916c;
+  --primary-dark: #1b4332;
+  --accent: #52b788;
+  --bg: #f5f7fa;
+  --card-bg: #ffffff;
+  --text: #333333;
+  --text-light: #666666;
+  --text-muted: #999999;
+  --border: #e0e0e0;
+  --shadow: rgba(0,0,0,0.08);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Navigation */
+.navbar {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: white;
+  padding: 0.8rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.15);
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-links a {
+  color: rgba(255,255,255,0.85);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+/* Main Container */
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Pages */
+.page {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.page.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Home Page */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  color: white;
+  padding: 4rem 3rem;
+  border-radius: 20px;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 10px 40px rgba(45,106,79,0.2);
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: white;
+  color: var(--primary);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 2px solid rgba(255,255,255,0.5);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.btn-action {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-action:hover {
+  background: var(--primary-dark);
+}
+
+/* Features Grid */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.feature-card {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.3s;
+  box-shadow: 0 2px 10px var(--shadow);
+  cursor: pointer;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.feature-card p {
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+/* Stats Section */
+.stats-section {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+  padding: 3rem;
+  border-radius: 20px;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.stats-inner {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+  min-width: 120px;
+}
+
+.stat-value {
+  font-size: 2.8rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-top: 0.3rem;
+}
+
+/* About Section */
+.about {
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.about h2 {
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+}
+
+.about p {
+  margin-bottom: 1rem;
+  color: var(--text-light);
+  line-height: 1.8;
+}
+
+.about .credit {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Search Page */
+.search-container {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.search-box {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  flex: 1;
+  padding: 1rem 1.2rem;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+}
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-row select, .filter-row input {
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: white;
+}
+
+/* Results */
+.results-container {
+  display: grid;
+  gap: 1rem;
+}
+
+.result-card {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--accent);
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px var(--shadow);
+  cursor: pointer;
+}
+
+.result-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.result-title {
+  font-size: 1.1rem;
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.result-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+
+.result-abstract {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.result-tags {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: #e8f5e9;
+  color: var(--primary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+/* Chat Page */
+.chat-container {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 15px var(--shadow);
+}
+
+.chat-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  padding: 1.2rem 1.5rem;
+  font-weight: 600;
+}
+
+.chat-messages {
+  height: 500px;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: #fafafa;
+}
+
+.message {
+  margin-bottom: 1rem;
+  display: flex;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.message.assistant {
+  justify-content: flex-start;
+}
+
+.message-content {
+  max-width: 75%;
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  line-height: 1.6;
+}
+
+.message.user .message-content {
+  background: var(--primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message.assistant .message-content {
+  background: white;
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-input-area {
+  padding: 1rem 1.5rem;
+  background: white;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 1rem;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 0.9rem 1.2rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.chat-input-area input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+}
+
+/* Standards Page */
+.standards-container {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.standard-card {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--primary-light);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.standard-card h3 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.standard-card .meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+.standard-card p {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* Tree Species Section */
+.section-title {
+  color: var(--primary);
+  font-size: 1.4rem;
+  margin: 2.5rem 0 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--accent);
+}
+
+.tree-species-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.tree-card {
+  background: var(--card-bg);
+  padding: 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.tree-card h4 {
+  color: var(--primary-dark);
+  margin-bottom: 0.5rem;
+}
+
+.tree-card .latin {
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.tree-card p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.5rem;
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+.modal h2 {
+  color: var(--primary-dark);
+  font-size: 1.4rem;
+  line-height: 1.4;
+  flex: 1;
+  padding-right: 1rem;
+}
+
+.modal-meta {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-section {
+  margin-bottom: 1.5rem;
+}
+
+.modal-section h4 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.modal-section p {
+  color: var(--text-light);
+  line-height: 1.8;
+}
+
+.modal-link {
+  color: var(--primary);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+.spinner {
+  border: 3px solid var(--border);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.empty-state .icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.8rem 1rem;
+  }
+  
+  .nav-logo {
+    font-size: 1.1rem;
+  }
+  
+  .nav-links {
+    gap: 0.2rem;
+  }
+  
+  .nav-links a {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+  
+  main {
+    padding: 1rem;
+  }
+  
+  .hero {
+    padding: 2.5rem 1.5rem;
+  }
+  
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+  }
+  
+  .features {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-inner {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .search-box {
+    flex-direction: column;
+  }
+  
+  .chat-messages {
+    height: 400px;
+  }
+  
+  .message-content {
+    max-width: 85%;
+  }
+  
+  .modal {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+}
+
+/* Highlight */
+mark {
+  background: #fff3cd;
+  padding: 0.1rem 0.2rem;
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo">🌲 森林疗愈智能体</div>
+    <div class="nav-links">
+      <a href="#" onclick="showPage('home', this); return false;" class="active">首页</a>
+      <a href="#" onclick="showPage('search', this); return false;">文献检索</a>
+      <a href="#" onclick="showPage('chat', this); return false;">智能问答</a>
+      <a href="#" onclick="showPage('standards', this); return false;">标准查询</a>
+      <a href="#" onclick="showPage('about', this); return false;">关于</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <!-- Home Page -->
+  <div id="page-home" class="page active">
+    <section class="hero">
+      <h1>🌲 森林疗愈智能体</h1>
+      <p>基于循证数据库的森林康养知识平台，整合 321 篇研究文献，为您提供科学可靠的森林疗愈知识</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="showPage('search', document.querySelectorAll('.nav-links a')[1])">开始检索</button>
+        <button class="btn btn-secondary" onclick="showPage('chat', document.querySelectorAll('.nav-links a')[2])">智能问答</button>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="feature-card" onclick="showPage('search', document.querySelectorAll('.nav-links a')[1])">
+        <div class="feature-icon">🔍</div>
+        <h3>文献检索</h3>
+        <p>支持中英文全文检索，覆盖 PubMed、OpenAlex 等权威数据库</p>
+      </div>
+      <div class="feature-card" onclick="showPage('chat', document.querySelectorAll('.nav-links a')[2])">
+        <div class="feature-icon">💬</div>
+        <h3>智能问答</h3>
+        <p>RAG 技术驱动，从 321 篇文献中获取精准答案</p>
+      </div>
+      <div class="feature-card" onclick="showPage('standards', document.querySelectorAll('.nav-links a')[3])">
+        <div class="feature-icon">📋</div>
+        <h3>标准查询</h3>
+        <p>18 项国际标准 + 10 种树种健康数据</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>研究看板</h3>
+        <p>追踪森林疗愈领域最新研究进展与数据</p>
+      </div>
+    </section>
+
+    <section class="stats-section">
+      <div class="stats-inner">
+        <div class="stat-item">
+          <div class="stat-value" id="stat-total">--</div>
+          <div class="stat-label">入库文献</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-standards">--</div>
+          <div class="stat-label">国际标准</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">v13</div>
+          <div class="stat-label">证据体系版本</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">25+</div>
+          <div class="stat-label">数据源</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about">
+      <h2>关于本平台</h2>
+      <p>森林疗愈智能体是一个基于循证医学的森林康养知识平台，整合了来自 PubMed、OpenAlex、Europe PMC、bioRxiv 等多个权威数据库的研究文献。</p>
+      <p>平台提供智能问答、全文检索、标准查询等功能，帮助用户获取科学可靠的森林疗愈知识，为森林康养实践提供数据支持。</p>
+      <p class="credit">同济大学 · 建筑学专业 · 2026</p>
+    </section>
+  </div>
+
+  <!-- Search Page -->
+  <div id="page-search" class="page">
+    <div class="search-container">
+      <div class="search-box">
+        <input type="text" id="search-input" class="search-input" placeholder="输入关键词搜索文献（支持中英文，如：anxiety、焦虑、phytoncide、植物杀菌素）" onkeyup="if(event.key==='Enter')searchReferences()">
+        <button class="btn btn-action" onclick="searchReferences()">🔍 搜索</button>
+      </div>
+      <div class="filter-row">
+        <select id="filter-year" onchange="searchReferences()">
+          <option value="">全部年份</option>
+          <option value="2024">2024年</option>
+          <option value="2023">2023年</option>
+          <option value="2022">2022年</option>
+          <option value="2021">2021年</option>
+          <option value="2020">2020年及以前</option>
+        </select>
+        <select id="filter-type" onchange="searchReferences()">
+          <option value="">全部类型</option>
+          <option value="journal">期刊论文</option>
+          <option value="review">综述</option>
+          <option value="meta">Meta分析</option>
+          <option value="clinical">临床试验</option>
+        </select>
+        <select id="sort-by" onchange="searchReferences()">
+          <option value="relevance">按相关性</option>
+          <option value="date">按时间</option>
+          <option value="citations">按引用</option>
+        </select>
+      </div>
+    </div>
+    <div id="search-results" class="results-container">
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <p>输入关键词开始搜索</p>
+        <p style="font-size:0.9rem;margin-top:0.5rem;">试试：森林浴、焦虑、免疫力、松柏烯、皮质醇</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Page -->
+  <div id="page-chat" class="page">
+    <div class="chat-container">
+      <div class="chat-header">💬 智能问答 - 基于 321 篇文献的 RAG 检索</div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="message assistant">
+          <div class="message-content">你好！我是森林疗愈智能体。你可以问我关于森林康养、植物挥发物、健康效益等方面的问题。我会基于数据库中的研究文献为你提供科学依据支持的答案。<br><br>例如你可以问：<br>• α-蒎烯对焦虑有什么影响？<br>• 森林浴如何降低皮质醇水平？<br>• 柏树精油有什么健康功效？</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="输入你的问题..." onkeyup="if(event.key==='Enter')sendMessage()">
+        <button class="btn btn-action" onclick="sendMessage()">发送</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standards Page -->
+  <div id="page-standards" class="page">
+    <h2 class="section-title">📋 国际标准</h2>
+    <div id="standards-container" class="standards-container">
+      <div class="loading"><div class="spinner"></div><p>加载中...</p></div>
+    </div>
+
+    <h2 class="section-title">🌲 树种数据</h2>
+    <div id="trees-container" class="tree-species-grid">
+      <div class="loading"><div class="spinner"></div><p>加载中...</p></div>
+    </div>
+  </div>
+
+  <!-- About Page -->
+  <div id="page-about" class="page">
+    <div class="about">
+      <h2>关于森林疗愈智能体</h2>
+      <p>森林疗愈智能体是一个基于循证医学的森林康养知识平台，整合了来自 PubMed、OpenAlex、Europe PMC、bioRxiv 等多个权威数据库的 <strong>321 篇</strong>研究文献。</p>
+      <p>平台核心功能包括：</p>
+      <ul style="margin:1rem 0 1rem 2rem;color:var(--text-light);line-height:2;">
+        <li><strong>智能问答</strong>：基于 RAG 技术，从文献中检索相关内容，由 DeepSeek 生成有据可查的回答</li>
+        <li><strong>全文检索</strong>：支持中英文关键词的全文智能搜索，覆盖标题、摘要、关键词</li>
+        <li><strong>标准查询</strong>：18 项国际标准 + 10 种树种的挥发物成分与健康功效数据</li>
+        <li><strong>研究看板</strong>：追踪森林疗愈领域的研究趋势与数据分布</li>
+      </ul>
+      <p>数据来源涵盖 25+ 个学术数据库，文献经过严格的质量评估与证据分级，采用 v13 版证据体系。</p>
+      <p class="credit">同济大学 · 建筑学专业 · 2026</p>
+    </div>
+  </div>
+</main>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-title"></h2>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-meta" id="modal-meta"></div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// Configuration
+const SUPABASE_URL = 'https://nejeqodayapiajelngen.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lamVxb2RheWFwaWFqZWxuZ2VuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTI1NzgsImV4cCI6MjEwMDk2ODU3OH0.UNpuUbgeyAFkEDp5rJtQVRHIo8XAr6fUIq8BiGhCTeI';
+const DEEPSEEK_API_KEY = 'sk-3ae25254a1564c49a20ba1b27dfc08f2';
+
+// Chinese-English keyword mapping for smart search
+const KEYWORD_MAP = {
+  // 情绪与心理
+  '焦虑': 'anxiety', '抑郁': 'depression', '压力': 'stress', '情绪': 'mood',
+  '睡眠': 'sleep', '失眠': 'insomnia', '疲劳': 'fatigue', '注意力': 'attention',
+  '幸福': 'wellbeing', '幸福感': 'well-being', '心理健康': 'mental health',
+  // 生理指标
+  '皮质醇': 'cortisol', '血压': 'blood pressure', '心率': 'heart rate',
+  '免疫力': 'immune', '免疫': 'immunity', '炎症': 'inflammation',
+  '血糖': 'blood glucose', '胆固醇': 'cholesterol',
+  // 植物挥发物
+  '植物杀菌素': 'phytoncide', '芬多精': 'phytoncide',
+  '蒎烯': 'pinene', 'α-蒎烯': 'alpha-pinene', 'β-蒎烯': 'beta-pinene',
+  '柠檬烯': 'limonene', '樟烯': 'camphene', '松烯': 'pinene',
+  '柏木烯': 'cedrol', '雪松烯': 'cedrene',
+  // 活动与疗法
+  '森林浴': 'forest bathing', '森林浴': 'shinrin-yoku', '森林漫步': 'forest walking',
+  '森林疗法': 'forest therapy', '森林康养': 'forest healing',
+  '自然疗法': 'nature therapy', '园艺疗法': 'horticulture therapy',
+  // 人群
+  '老年人': 'elderly', '老年': 'older adults', '儿童': 'children',
+  '青少年': 'adolescents', '上班族': 'workers', '患者': 'patients',
+  // 环境
+  '森林': 'forest', '树木': 'trees', '绿地': 'green space', '自然': 'nature',
+  '公园': 'park', '木材': 'wood', '木质': 'wooden',
+  // 效果
+  '放松': 'relaxation', '舒缓': 'relief', '恢复': 'recovery',
+  '康复': 'rehabilitation', '健康': 'health', '养生': 'wellness'
+};
+
+// Navigation
+function showPage(pageId, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+  
+  if (pageId === 'home') loadStats();
+  if (pageId === 'search') loadDefaultSearchResults();
+  if (pageId === 'standards') { loadStandards(); loadTreeSpecies(); }
+}
+
+// Translate Chinese query to English
+function translateQuery(query) {
+  let translated = query.toLowerCase();
+  for (const [cn, en] of Object.entries(KEYWORD_MAP)) {
+    if (query.includes(cn)) {
+      translated = translated.replace(new RegExp(cn, 'g'), en);
+    }
+  }
+  return translated || query;
+}
+
+// Load stats
+async function loadStats() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/references?select=id&status=eq.approved`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const data = await res.json();
+    document.getElementById('stat-total').textContent = data.length || '321';
+    
+    const stdRes = await fetch(`${SUPABASE_URL}/rest/v1/standards?select=id`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const stdData = await stdRes.json();
+    document.getElementById('stat-standards').textContent = stdData.length || '18';
+  } catch (e) {
+    console.error('Stats error:', e);
+    document.getElementById('stat-total').textContent = '321';
+    document.getElementById('stat-standards').textContent = '18';
+  }
+}
+
+// Load default search results
+async function loadDefaultSearchResults() {
+  const resultsDiv = document.getElementById('search-results');
+  resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载最新文献...</p></div>';
+  
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/references?select=*&status=eq.approved&order=year.desc.nullslast&limit=20`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const results = await res.json();
+    renderSearchResults(results, '');
+  } catch (e) {
+    resultsDiv.innerHTML = '<div class="empty-state"><div class="icon">❌</div><p>加载失败，请刷新重试</p></div>';
+  }
+}
+
+// Search references
+async function searchReferences() {
+  const query = document.getElementById('search-input').value.trim();
+  const yearFilter = document.getElementById('filter-year').value;
+  const typeFilter = document.getElementById('filter-type').value;
+  
+  const resultsDiv = document.getElementById('search-results');
+  
+  if (!query && !yearFilter && !typeFilter) {
+    loadDefaultSearchResults();
+    return;
+  }
+  
+  resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>搜索中...</p></div>';
+  
+  // Translate Chinese to English for search
+  const searchQuery = translateQuery(query);
+  
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/search_references`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY
+      },
+      body: JSON.stringify({ 
+        query_text: searchQuery || query,
+        limit_count: 50
+      })
+    });
+    
+    let results = await res.json();
+    
+    // Apply filters
+    if (yearFilter) {
+      if (yearFilter === '2020') {
+        results = results.filter(r => r.year && r.year <= 2020);
+      } else {
+        results = results.filter(r => r.year && String(r.year) === yearFilter);
+      }
+    }
+    
+    if (typeFilter) {
+      results = results.filter(r => r.publication_type === typeFilter);
+    }
+    
+    // Sort
+    const sortBy = document.getElementById('sort-by').value;
+    if (sortBy === 'date') {
+      results.sort((a, b) => (b.year || 0) - (a.year || 0));
+    }
+    
+    renderSearchResults(results, query);
+  } catch (e) {
+    resultsDiv.innerHTML = '<div class="empty-state"><div class="icon">❌</div><p>搜索失败，请检查网络连接</p></div>';
+    console.error('Search error:', e);
+  }
+}
+
+// Render search results
+function renderSearchResults(results, query) {
+  const resultsDiv = document.getElementById('search-results');
+  
+  if (!results || results.length === 0) {
+    resultsDiv.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>未找到相关文献</p><p style="font-size:0.9rem;margin-top:0.5rem;">试试其他关键词</p></div>';
+    return;
+  }
+  
+  resultsDiv.innerHTML = `<p style="color:var(--text-muted);margin-bottom:1rem;">找到 ${results.length} 条结果</p>` +
+    results.map((r, idx) => {
+      let title = r.title || '无标题';
+      let abstract = r.abstract_cn || r.abstract || '';
+      
+      // Highlight keywords
+      if (query) {
+        const keywords = query.split(/\s+/);
+        keywords.forEach(kw => {
+          if (kw) {
+            const regex = new RegExp(`(${escapeRegex(kw)})`, 'gi');
+            title = title.replace(regex, '<mark>$1</mark>');
+            abstract = abstract.replace(regex, '<mark>$1</mark>');
+          }
+        });
+      }
+      
+      return `
+        <div class="result-card" onclick="showDetail(${idx})">
+          <div class="result-title">${title}</div>
+          <div class="result-meta">
+            ${escapeHtml(r.authors || '').substring(0, 50)}${r.authors && r.authors.length > 50 ? '...' : ''}
+            ${r.year ? ' · ' + r.year : ''}
+            ${r.journal ? ' · ' + escapeHtml(r.journal) : ''}
+            ${r.data_source ? ' · ' + escapeHtml(r.data_source) : ''}
+          </div>
+          <div class="result-abstract">${abstract}</div>
+          <div class="result-tags">
+            ${r.keywords ? r.keywords.split(';').slice(0, 3).map(k => `<span class="tag">${escapeHtml(k.trim())}</span>`).join('') : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  
+  // Store results for detail view
+  window.currentResults = results;
+}
+
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Show detail modal
+function showDetail(idx) {
+  const r = window.currentResults[idx];
+  if (!r) return;
+  
+  document.getElementById('modal-title').textContent = r.title || '无标题';
+  document.getElementById('modal-meta').innerHTML = `
+    <strong>作者：</strong>${escapeHtml(r.authors || '未知')}<br>
+    <strong>发表：</strong>${r.year || '未知'} ${r.journal ? '· ' + escapeHtml(r.journal) : ''}<br>
+    <strong>来源：</strong>${escapeHtml(r.data_source || '未知')}
+    ${r.doi ? '<br><strong>DOI：</strong><a href="https://doi.org/' + r.doi + '" target="_blank" class="modal-link">' + r.doi + '</a>' : ''}
+  `;
+  
+  let content = '';
+  
+  if (r.abstract_cn) {
+    content += `<div class="modal-section"><h4>中文摘要</h4><p>${escapeHtml(r.abstract_cn)}</p></div>`;
+  }
+  if (r.abstract) {
+    content += `<div class="modal-section"><h4>英文摘要</h4><p>${escapeHtml(r.abstract)}</p></div>`;
+  }
+  if (r.keywords) {
+    content += `<div class="modal-section"><h4>关键词</h4><p>${escapeHtml(r.keywords)}</p></div>`;
+  }
+  if (r.health_benefits) {
+    content += `<div class="modal-section"><h4>健康效益</h4><p>${escapeHtml(r.health_benefits)}</p></div>`;
+  }
+  if (r.evidence_level) {
+    content += `<div class="modal-section"><h4>证据等级</h4><p>${escapeHtml(r.evidence_level)}</p></div>`;
+  }
+  if (r.url && !r.doi) {
+    content += `<div class="modal-section"><h4>原文链接</h4><a href="${r.url}" target="_blank" class="modal-link">${r.url}</a></div>`;
+  }
+  
+  document.getElementById('modal-content').innerHTML = content;
+  document.getElementById('detail-modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('detail-modal').classList.remove('active');
+}
+
+// Close modal on overlay click
+document.getElementById('detail-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Chat
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const message = input.value.trim();
+  if (!message) return;
+  
+  const messagesDiv = document.getElementById('chat-messages');
+  
+  // Add user message
+  messagesDiv.innerHTML += `<div class="message user"><div class="message-content">${escapeHtml(message)}</div></div>`;
+  input.value = '';
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  
+  // Add thinking message
+  messagesDiv.innerHTML += '<div class="message assistant" id="thinking-msg"><div class="message-content">🤔 正在从 321 篇文献中检索相关信息...</div></div>';
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  
+  try {
+    // Translate and search
+    const searchQuery = translateQuery(message);
+    
+    const searchRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/search_references`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY
+      },
+      body: JSON.stringify({ query_text: searchQuery, limit_count: 5 })
+    });
+    
+    const refs = await searchRes.json();
+    
+    if (refs.length === 0) {
+      document.getElementById('thinking-msg').innerHTML = '<div class="message-content">抱歉，未在数据库中找到与您问题高度相关的文献。您可以尝试换个问法，或提出更具体的问题。</div>';
+      return;
+    }
+    
+    // Build context
+    const context = refs.map((r, i) => `[文献${i+1}] ${r.title}\n摘要: ${r.abstract_cn || r.abstract || '无'}\n${r.year ? '年份: ' + r.year : ''}`).join('\n\n---\n\n');
+    
+    // Update thinking message
+    document.getElementById('thinking-msg').innerHTML = '<div class="message-content">📚 找到 ' + refs.length + ' 篇相关文献，正在生成回答...</div>';
+    
+    // Call DeepSeek
+    const aiRes = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + DEEPSEEK_API_KEY
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { 
+            role: 'system', 
+            content: '你是森林疗愈领域的专家助手。请严格根据提供的文献内容回答用户问题。要求：\n1. 回答必须基于提供的文献，不要编造信息\n2. 引用文献时标注来源，如"根据文献[1]..."\n3. 如果文献中没有相关信息，诚实说明\n4. 回答简洁、准确、有科学依据\n5. 使用中文回答'
+          },
+          { 
+            role: 'user', 
+            content: `以下是相关文献内容：\n\n${context}\n\n---\n\n用户问题：${message}`
+          }
+        ],
+        temperature: 0.3
+      })
+    });
+    
+    const aiData = await aiRes.json();
+    const answer = aiData.choices[0].message.content;
+    
+    // Replace thinking message with answer
+    document.getElementById('thinking-msg').innerHTML = `<div class="message-content">${formatMarkdown(answer)}</div>`;
+    
+  } catch (e) {
+    document.getElementById('thinking-msg').innerHTML = '<div class="message-content">抱歉，回答生成失败，请稍后重试。</div>';
+    console.error('Chat error:', e);
+  }
+  
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Simple markdown formatting
+function formatMarkdown(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+    .replace(/\n/g, '<br>');
+}
+
+// Load standards
+async function loadStandards() {
+  const container = document.getElementById('standards-container');
+  
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/standards?select=*`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const standards = await res.json();
+    
+    if (standards.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>暂无标准数据</p></div>';
+      return;
+    }
+    
+    container.innerHTML = standards.map(s => `
+      <div class="standard-card">
+        <h3>${escapeHtml(s.name || '未命名标准')}</h3>
+        <div class="meta">
+          ${s.organization ? escapeHtml(s.organization) : ''}
+          ${s.year ? ' · ' + s.year : ''}
+          ${s.category ? ' · ' + escapeHtml(s.category) : ''}
+        </div>
+        <p>${escapeHtml(s.description || '暂无描述')}</p>
+        ${s.url ? '<a href="' + s.url + '" target="_blank" style="color:var(--primary);font-size:0.9rem;">查看详情 →</a>' : ''}
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = '<div class="empty-state"><p>加载失败，请刷新重试</p></div>';
+    console.error('Standards error:', e);
+  }
+}
+
+// Load tree species
+async function loadTreeSpecies() {
+  const container = document.getElementById('trees-container');
+  
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/tree_species?select=*`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const trees = await res.json();
+    
+    if (trees.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>暂无树种数据</p></div>';
+      return;
+    }
+    
+    container.innerHTML = trees.map(t => `
+      <div class="tree-card">
+        <h4>${escapeHtml(t.common_name_cn || t.common_name || '未知树种')}</h4>
+        <div class="latin">${escapeHtml(t.latin_name || '')}</div>
+        <p><strong>主要挥发物：</strong>${escapeHtml(t.major_compounds || '未知')}</p>
+        <p><strong>健康功效：</strong>${escapeHtml(t.health_benefits || '未知')}</p>
+        ${t.recommended_for ? '<p><strong>推荐人群：</strong>' + escapeHtml(t.recommended_for) + '</p>' : ''}
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = '<div class="empty-state"><p>加载失败，请刷新重试</p></div>';
+    console.error('Tree species error:', e);
+  }
+}
+
+// Utils
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  loadStats();
+  loadDefaultSearchResults();
+});
+</script>
+
+</body>
+</html>
